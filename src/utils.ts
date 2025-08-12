@@ -57,43 +57,54 @@ export function getImageTokens(tokenList: any[], tokens: Tokens.Image[] = []) {
 }
 
 
-// "jpg" | "png" | "gif" | "bmp"
-const ImageTypeWhitelist = new Set(['jpg', 'png', 'gif', 'bmp', 'webp'])
+// A map to normalize mime types to file extensions.
+const mimeTypeToExtension: Record<string, MarkdownImageType> = {
+  jpeg: 'jpg',
+  png: 'png',
+  gif: 'gif',
+  bmp: 'bmp',
+  webp: 'webp',
+  'svg+xml': 'svg',
+}
 
-export function getImageExtension(filename: string = '', mime?: string | null): MarkdownImageType | null {
-  let ext = ''
-  switch (mime) {
-    case 'image/jpeg':
-      ext = 'jpg'
-      break
-    case 'image/png':
-      ext = 'png'
-      break
-    case 'image/gif':
-      ext = 'gif'
-      break
-    case 'image/bmp':
-      ext = 'bmp'
-      break
-    case 'image/webp':
-      ext = 'webp'
-      break
-    case 'image/svg+xml':
-      ext = 'svg'
-      break
-    default:
-      const name = filename.split('?').pop() || ''
-      const index = name.lastIndexOf('.')
-      if (index > -1) {
-        ext = name.substring(index + 1)
-      }
-      break
+// Whitelist of supported image types.
+const ImageTypeWhitelist = new Set(Object.values(mimeTypeToExtension) )
+
+
+
+/**
+ * Gets the image extension from the filename or mime type.
+ * @param filename - The filename of the image.
+ * @param mime - The mime type of the image.
+ * @returns The image extension.
+ * @throws An error if the image extension cannot be determined or is not supported.
+ */
+export function getImageExtension(filename: string = '', mime?: string | null): MarkdownImageType {
+  let ext: string | undefined
+
+  if (mime) {
+    // Normalize mime type, e.g., "image/jpeg" -> "jpeg", or "jpeg" -> "jpeg"
+    const type = mime.includes('/') ? mime.split('/')[1] : mime
+    if (type) {
+      ext = mimeTypeToExtension[type]
+    }
+  }
+
+  // If extension is not found from mime type, try to get it from the filename.
+  if (!ext && filename) {
+    const name = filename.split('?').pop() || ''
+    const index = name.lastIndexOf('.')
+    if (index > -1) {
+      ext = name.substring(index + 1).toLowerCase()
+    }
   }
 
   if (!ext) {
-    throw new Error(`Cannot get Image extension from mime type: ${mime}`)
-  } else if (!ImageTypeWhitelist.has(ext)) {
-    throw new Error(`Image extension ${ext} is not supported`)
+    throw new Error(`Cannot get image extension from filename "${filename}" or mime type "${mime}"`)
+  }
+
+  if (!ImageTypeWhitelist.has(ext as MarkdownImageType)) {
+    throw new Error(`Image extension "${ext}" is not supported`)
   }
 
   return ext as MarkdownImageType

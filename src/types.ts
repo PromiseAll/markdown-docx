@@ -5,7 +5,7 @@ import { MarkedOptions, Tokens } from 'marked'
 
 import { Footnote, FootnoteRef } from './extensions'
 
-export type MarkdownImageType = 'jpg' | 'png' | 'gif' | 'bmp'
+export type MarkdownImageType = 'jpg' | 'png' | 'gif' | 'bmp' | 'webp' | 'svg'
 
 export type MarkdownImageItem = {
   type: MarkdownImageType
@@ -96,14 +96,14 @@ export type ITextAttr = {
   codespan?: boolean
   del?: boolean
   br?: boolean
-  
+
 }
 
 export type IBlockAttr = {
   style?: string
 
   blockquote?: boolean
-  
+
   list?: {
     task?: boolean
     checked?: boolean
@@ -124,7 +124,7 @@ export type Writeable<T> = {
   -readonly [P in keyof T]: T[P]
 }
 
-export type IMarkdownToken = 
+export type IMarkdownToken =
   |'space' | 'code' | 'hr'| 'blockquote'| 'html'| 'def'| 'paragraph'| 'text'| 'footnote'| 'listItem'| 'table'| 'tableHeader'| 'tableCell'| 'heading1'| 'heading2'| 'heading3'| 'heading4'| 'heading5'| 'heading6'
   | 'tag' | 'link' | 'strong' | 'em' | 'codespan' | 'del' | 'br'
 
