@@ -87,6 +87,9 @@ export function getImageExtension(filename: string = '', mime?: string | null): 
     const type = mime.includes('/') ? mime.split('/')[1] : mime
     if (type) {
       ext = mimeTypeToExtension[type]
+    }else{
+      // If the mime type is not in the map, try to get the extension from the
+      ext = "png"
     }
   }
 
